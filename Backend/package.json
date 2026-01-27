@@ -9,6 +9,9 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "mongoose": "^9.1.5"
+    "json2csv": "^6.0.0-alpha.2",
+    "mongoose": "^9.1.5",
+    "nodemailer": "^7.0.13",
+    "winston": "^3.19.0"
   }
 }
