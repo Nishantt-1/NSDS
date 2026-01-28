@@ -12,3 +12,4 @@ exports.addMember = async (req, res) => {
     });
     res.json({ message: "Member added" });
 };
+

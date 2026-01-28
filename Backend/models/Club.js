@@ -54,7 +54,13 @@ const ClubSchema = new mongoose.Schema({
   isActive: {
     type: Boolean,
     default: true // Admin can deactivate a club if needed
-  }
+  },
+   joinRequests: [{
+    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    status: { type: String, enum: ['PENDING', 'APPROVED', 'REJECTED'], default: 'PENDING' },
+    requestedAt: { type: Date, default: Date.now }
+  }]
+
 }, { 
   timestamps: true // Automatically creates createdAt and updatedAt fields
 });
