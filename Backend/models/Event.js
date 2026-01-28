@@ -6,7 +6,7 @@ const EventSchema = new mongoose.Schema({
   status: { 
     type: String, 
     enum: ['DRAFT', 'PENDING', 'APPROVED', 'REJECTED', 'COMPLETED'], 
-    default: 'DRAFT' 
+    default: 'DRAFT'
   },
   startTime: { type: Date, required: true },
   endTime: { type: Date, required: true },
