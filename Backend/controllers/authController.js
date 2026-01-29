@@ -12,20 +12,42 @@ function generateOtp6() {
 }
 
 exports.register = async (req, res) => {
-  const { name, email, password, role, department, year } = req.body;
-  const hashedPassword = await bcrypt.hash(password, 10);
-  const user = await User.create({ name, email, password: hashedPassword, role, department, year });
+  try {
+    const { name, email, password, role, department, year } = req.body;
 
-  const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET);
+    if (!name || !email || !password) {
+      return res.status(400).json({ message: "name, email, password are required" });
+    }
 
-  res.cookie("token", token, {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: false, // true on HTTPS in production
-  });
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-  res.status(201).json({ message: "User created" });
+    const user = await User.create({
+      name,
+      email,
+      password: hashedPassword,
+      role,
+      department,
+      year,
+    });
+
+    const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET);
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: false,
+    });
+
+    return res.status(201).json({ message: "User created" });
+  } catch (err) {
+    // common: duplicate email unique index => E11000
+    if (err?.code === 11000) {
+      return res.status(409).json({ message: "Email already exists" });
+    }
+    return res.status(500).json({ message: err.message || "Server error" });
+  }
 };
+
 
 // STEP 1: verify password, then send OTP (no cookie yet)
 exports.login = async (req, res) => {

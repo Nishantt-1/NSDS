@@ -1,6 +1,6 @@
 const rateLimit = require("express-rate-limit");
 
-exports.otpRequestLimiter = rateLimit({
+exports.loginLimiter = rateLimit({
   windowMs: 10 * 60 * 1000, // 10 min
   max: 5, // 5 OTP sends per IP per 10 min
   message: { message: "Too many OTP requests. Try again later." },
