@@ -1,0 +1,24 @@
+const express = require('express');
+const cookieParser = require('cookie-parser');
+const authRoutes = require('./routes/authRoutes');
+const userRoutes = require('./routes/userRoutes');
+const cors =   require('cors');
+
+
+const app = express() ; 
+app.use(cors({
+    origin : 'http://localhost:3000',
+    credentials : true
+}))
+app.use(cookieParser());
+app.use(express.json());
+
+app.get("/",(req,res) => {
+    res.send("NSDS Backend is running")
+})
+
+
+app.use("/api/auth", authRoutes);   
+app.use("/api/users", userRoutes);
+
+module.exports = app;

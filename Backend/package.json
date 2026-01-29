@@ -10,6 +10,9 @@
   "description": "",
   "dependencies": {
     "cookie-parser": "^1.4.7",
+    "crypto": "^1.0.1",
+    "express-rate-limit": "^8.2.1",
+    "joi": "^18.0.2",
     "json2csv": "^6.0.0-alpha.2",
     "mongoose": "^9.1.5",
     "nodemailer": "^7.0.13",
