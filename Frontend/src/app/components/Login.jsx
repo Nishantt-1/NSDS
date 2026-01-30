@@ -24,15 +24,15 @@ export default function Login() {
       );
 
       // backend sends: { step: "OTP_REQUIRED", userId, message }
-      if (res.data?.step === "OTP_REQUIRED") {
-        navigate("/otp/verify", {
-          state: { userId: res.data.userId, email: data.email },
-        }); // pass state to next route [web:338]
-        return;
-      }
+      // if (res.data?.step === "OTP_REQUIRED") {
+      //   navigate("/otp/verify", {
+      //     state: { userId: res.data.userId, email: data.email },
+      //   }); // pass state to next route [web:338]
+      //   return;
+      // }
 
       // In case you later allow normal login too:
-      navigate("/");
+      navigate("/profile");
     } catch (err) {
       const msg = err?.response?.data?.message || "Login failed";
       setError("root", { type: "server", message: msg });

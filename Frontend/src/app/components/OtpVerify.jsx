@@ -31,7 +31,7 @@ export default function OtpVerify() {
         { withCredentials: true } // accept cookie set by backend [web:225]
       );
 
-      navigate("/"); // change to dashboard/protected route later
+      navigate("/Profile"); // change to dashboard/protected route later
     } catch (err) {
       const msg = err?.response?.data?.message || "OTP verification failed";
       setError("otp", { type: "server", message: msg });

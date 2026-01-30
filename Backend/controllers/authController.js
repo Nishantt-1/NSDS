@@ -50,6 +50,44 @@ exports.register = async (req, res) => {
 
 
 // STEP 1: verify password, then send OTP (no cookie yet)
+// exports.login = async (req, res) => {
+//   try {
+//     const { email, password } = req.body;
+
+//     const user = await User.findOne({ email });
+//     if (!user) return res.status(401).json({ message: "Invalid credentials" });
+
+//     const ok = await bcrypt.compare(password, user.password);
+//     if (!ok) return res.status(401).json({ message: "Invalid credentials" });
+
+//     // invalidate any previous unused OTPs for this user
+//     await LoginOtp.updateMany({ user: user._id, used: false }, { used: true });
+
+//     const otp = generateOtp6();
+//     const otpHash = await bcrypt.hash(otp, 10);
+
+//     const expiresMin = Number(process.env.OTP_EXPIRES_MIN || 5);
+//     const expiresAt = new Date(Date.now() + expiresMin * 60 * 1000);
+
+//     await LoginOtp.create({ user: user._id, otpHash, expiresAt });
+
+//     await sendEmail({
+//       to: user.email,
+//       subject: "Your login OTP",
+//       text: `Your OTP is ${otp}. It expires in ${expiresMin} minutes.`,
+//     });
+
+//     // IMPORTANT: don’t return JWT yet
+//     return res.json({
+//       step: "OTP_REQUIRED",
+//       message: "OTP sent to email",
+//       userId: user._id, // or a temporary loginId; this is simplest for now
+//     });
+//   } catch (err) {
+//     return res.status(500).json({ message: err.message || "Server error" });
+//   }
+// };
+
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -60,33 +98,25 @@ exports.login = async (req, res) => {
     const ok = await bcrypt.compare(password, user.password);
     if (!ok) return res.status(401).json({ message: "Invalid credentials" });
 
-    // invalidate any previous unused OTPs for this user
-    await LoginOtp.updateMany({ user: user._id, used: false }, { used: true });
+    const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET);
 
-    const otp = generateOtp6();
-    const otpHash = await bcrypt.hash(otp, 10);
-
-    const expiresMin = Number(process.env.OTP_EXPIRES_MIN || 5);
-    const expiresAt = new Date(Date.now() + expiresMin * 60 * 1000);
-
-    await LoginOtp.create({ user: user._id, otpHash, expiresAt });
-
-    await sendEmail({
-      to: user.email,
-      subject: "Your login OTP",
-      text: `Your OTP is ${otp}. It expires in ${expiresMin} minutes.`,
+    res.cookie("token", token, {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: false,
     });
 
-    // IMPORTANT: don’t return JWT yet
-    return res.json({
-      step: "OTP_REQUIRED",
-      message: "OTP sent to email",
-      userId: user._id, // or a temporary loginId; this is simplest for now
-    });
+    return res.json({ message: "Logged in", user: { name: user.name, role: user.role } });
+    
   } catch (err) {
     return res.status(500).json({ message: err.message || "Server error" });
   }
 };
+
+
+
+
+
 
 // STEP 2: verify OTP, then set cookie + return user
 exports.verifyLoginOtp = async (req, res) => {
