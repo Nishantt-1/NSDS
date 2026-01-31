@@ -25,6 +25,8 @@ const authenticate = async (req, res, next) => {
   }
 };
 
+
+
 /**
  * Authorization Middleware: Checks if user role matches allowed roles
  * @param {Array} roles - e.g., ['ADMIN', 'ORGANIZER']
@@ -44,4 +46,4 @@ const authorize = (roles = []) => {
   };
 };
 
-module.exports = { authenticate, authorize };
+module.exports = { authenticate, authorize  };

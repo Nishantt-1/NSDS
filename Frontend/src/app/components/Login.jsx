@@ -1,10 +1,13 @@
+// src/app/components/Login.jsx
 import React from "react";
 import axios from "axios";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../help/AuthContext";
 
 export default function Login() {
   const navigate = useNavigate();
+  const { setUser } = useAuth();
 
   const {
     register,
@@ -20,19 +23,12 @@ export default function Login() {
       const res = await axios.post(
         "http://localhost:3000/api/auth/login",
         { email: data.email, password: data.password },
-        { withCredentials: true } // safe to keep on; cookie will be set after OTP verify [web:225]
+        { withCredentials: true }
       );
 
-      // backend sends: { step: "OTP_REQUIRED", userId, message }
-      // if (res.data?.step === "OTP_REQUIRED") {
-      //   navigate("/otp/verify", {
-      //     state: { userId: res.data.userId, email: data.email },
-      //   }); // pass state to next route [web:338]
-      //   return;
-      // }
-
-      // In case you later allow normal login too:
-      navigate("/profile");
+      // immediately update context, then go to dashboard
+      setUser(res.data.user);
+      navigate("/dashboard");
     } catch (err) {
       const msg = err?.response?.data?.message || "Login failed";
       setError("root", { type: "server", message: msg });
@@ -44,7 +40,7 @@ export default function Login() {
       <div className="w-full max-w-md rounded-2xl border border-slate-800 bg-slate-900/60 p-6 shadow-xl">
         <h1 className="text-2xl font-semibold">Sign in</h1>
         <p className="mt-1 text-sm text-slate-300">
-          Step 1: enter email + password. We’ll send you an OTP.
+          Step 1: enter email + password.
         </p>
 
         <form onSubmit={handleSubmit(onSubmit)} className="mt-6 space-y-4" noValidate>
@@ -63,7 +59,9 @@ export default function Login() {
               ].join(" ")}
               {...register("email", { required: "Email is required" })}
             />
-            {errors.email && <p className="mt-1 text-sm text-red-400">{errors.email.message}</p>}
+            {errors.email && (
+              <p className="mt-1 text-sm text-red-400">{errors.email.message}</p>
+            )}
           </div>
 
           <div>
@@ -97,7 +95,7 @@ export default function Login() {
             disabled={isSubmitting}
             className="w-full rounded-lg bg-indigo-600 px-4 py-2.5 font-medium text-white hover:bg-indigo-500 disabled:opacity-60"
           >
-            {isSubmitting ? "Sending OTP..." : "Continue"}
+            {isSubmitting ? "Logging in..." : "Continue"}
           </button>
         </form>
 

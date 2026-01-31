@@ -2,6 +2,7 @@ const express = require('express');
 const cookieParser = require('cookie-parser');
 const authRoutes = require('./routes/auth.routes');
 const userRoutes = require('./routes/user.routes');
+const serviceRoutes = require('./routes/services.routes');
 const cors =   require('cors');
 require("./models"); 
 
@@ -20,5 +21,6 @@ app.get("/",(req,res) => {
 
 app.use("/api/auth", authRoutes);   
 app.use("/api/users", userRoutes);
+app.use("/api/services", serviceRoutes);
 
 module.exports = app;
